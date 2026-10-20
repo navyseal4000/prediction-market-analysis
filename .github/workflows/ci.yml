@@ -1,13 +1,19 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   lint:
+    if: ${{ github.repository_owner == 'navyseal4000' && github.actor == 'navyseal4000' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login == 'navyseal4000')) }}
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, navy-local, repo-prediction-market-analysis]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,8 +34,9 @@ jobs:
         run: uv run ruff format --check .
 
   test:
+    if: ${{ github.repository_owner == 'navyseal4000' && github.actor == 'navyseal4000' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login == 'navyseal4000')) }}
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, navy-local, repo-prediction-market-analysis]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
